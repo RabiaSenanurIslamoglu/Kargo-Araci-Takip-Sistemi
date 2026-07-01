@@ -70,8 +70,11 @@ README (mimari diyagram, kurulum, ekran görüntüleri), temiz commit geçmişi,
 
 ## Şu anki durum
 
-- **Aktif aşama:** Aşama 0 — Temeller (geliştirme ortamı kuruluyor).
-- Repo yeni oluşturuldu, henüz kod yok.
+- **Aktif aşama:** Aşama 0 tamamlandı → Aşama 1'e geçiliyor.
+- Geliştirme ortamı hazır: Node.js v24, PostgreSQL 17 (localhost:5432, superuser `postgres` / şifre `postgres`,
+  yalnızca yerel geliştirme için), GitHub CLI, Git.
+- Uzak depo: https://github.com/RabiaSenanurIslamoglu/Kargo-Araci-Takip-Sistemi (public)
+- Henüz uygulama kodu yok; sıradaki adım gereksinim ve mimari dokümanı (Aşama 1).
 
 ## Teknoloji yığını (Aşama 1'de kesinleşecek, şimdilik roadmap varsayımı)
 

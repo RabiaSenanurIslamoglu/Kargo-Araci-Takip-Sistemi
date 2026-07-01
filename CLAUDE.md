@@ -70,11 +70,14 @@ README (mimari diyagram, kurulum, ekran görüntüleri), temiz commit geçmişi,
 
 ## Şu anki durum
 
-- **Aktif aşama:** Aşama 0 tamamlandı → Aşama 1'e geçiliyor.
+- **Aktif aşama:** Aşama 1 tamamlandı → Aşama 2'ye geçiliyor.
 - Geliştirme ortamı hazır: Node.js v24, PostgreSQL 17 (localhost:5432, superuser `postgres` / şifre `postgres`,
   yalnızca yerel geliştirme için), GitHub CLI, Git.
 - Uzak depo: https://github.com/RabiaSenanurIslamoglu/Kargo-Araci-Takip-Sistemi (public)
-- Henüz uygulama kodu yok; sıradaki adım gereksinim ve mimari dokümanı (Aşama 1).
+- Gereksinim + mimari dokümanı hazır: [docs/gereksinimler-ve-mimari.md](docs/gereksinimler-ve-mimari.md)
+  (roller: Yönetici/Dispeçer/Sürücü, mimari diyagram, teknoloji seçim gerekçeleri, kapsam dışı kararlar).
+- STRIDE tehdit modeli hazır: [docs/kavram-notlari.md](docs/kavram-notlari.md) içinde "Aşama 1" bölümü.
+- Henüz uygulama kodu yok; sıradaki adım veritabanı modeli + FastAPI temeli (Aşama 2).
 
 ## Teknoloji yığını (Aşama 1'de kesinleşecek, şimdilik roadmap varsayımı)
 

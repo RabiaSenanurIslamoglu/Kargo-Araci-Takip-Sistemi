@@ -176,4 +176,38 @@ Yukarıdaki örnek: "araçları, sürücülerinin adıyla birlikte listele."
 
 ---
 
+## Aşama 1 — STRIDE ile basit tehdit modeli
+
+STRIDE, bir sistemi "kötüye kullanma" açısından altı kategoride sorgulamanın bir yolu.
+Her harf bir tehdit türü. Amaç kod yazmadan önce "bu bileşen nasıl istismar edilir?" diye
+sormak — güvenliği sona bırakmak yerine baştan tasarıma dahil etmek (**security by design**).
+
+| Harf | Tehdit türü | Sorulan soru |
+|---|---|---|
+| **S**poofing | Kimlik taklidi | Biri başkasıymış gibi davranabilir mi? |
+| **T**ampering | Veri bozma | Biri iletilen/saklanan veriyi değiştirebilir mi? |
+| **R**epudiation | İnkâr edebilme | Biri yaptığı bir işlemi inkâr edebilir mi (log yoksa)? |
+| **I**nformation Disclosure | Bilgi sızıntısı | Yetkisiz biri hassas veriye erişebilir mi? |
+| **D**enial of Service | Hizmeti aksatma | Biri sistemi kullanılamaz hale getirebilir mi? |
+| **E**levation of Privilege | Yetki yükseltme | Düşük yetkili biri kendine daha fazla yetki verebilir mi? |
+
+### Kargo Aracı Takip Sistemi'ne uygulanışı
+
+| Bileşen | Tehdit (STRIDE) | Somut senaryo | Önlem (nerede ele alınacak) |
+|---|---|---|---|
+| Giriş uç noktası (`/auth/login`) | Spoofing | Biri başka bir sürücünün hesabıyla giriş yapmaya çalışır (şifre tahmini/brute-force) | bcrypt hash + rate limiting; başarısız girişleri logla — **Aşama 3, 7** |
+| JWT token | Tampering | Biri token içindeki `rol` alanını değiştirip "yönetici" gibi davranmaya çalışır | Token sunucu tarafında imzalanır (HMAC/RS256), imza doğrulanmadan hiçbir alan güvenilmez — **Aşama 3** |
+| Konum güncelleme uç noktası (`POST /araclar/{id}/konum`) | Tampering | Sürücü A, kendi token'ıyla sürücü B'nin aracının konumunu güncellemeye çalışır | Uç nokta, token'daki kullanıcı ile hedef `arac_id`'nin sahibi olup olmadığını kontrol eder — **Aşama 3** |
+| Görev durumu güncelleme | Repudiation | Bir görev "tamamlandı" olarak işaretlenir ama kim yaptığı belli değil | Her state-değişikliğine `kullanici_id` + zaman damgası ile log tutulur — **Aşama 7 (loglama)** |
+| Kullanıcı/araç/konum verisi | Information Disclosure | Sürücü, `GET /araclar` çağırıp tüm filonun konumunu görür (sadece kendi aracını görmeli) | Her uç noktada role göre veri filtrelenir, sadece yetkili olduğu satırlar döner — **Aşama 3 (RBAC)** |
+| Hata mesajları | Information Disclosure | 500 hatasında stack trace veya SQL sorgusu istemciye sızar | Prod'da jenerik hata mesajı, detay sadece sunucu logunda — **Aşama 7 (güvenlik gözden geçirme)** |
+| Konum güncelleme uç noktası | Denial of Service | Bir istemci saniyede binlerce sahte konum isteği gönderir, backend/veritabanını boğar | Rate limiting, makul istek sıklığı doğrulaması — **Aşama 7** |
+| Görev atama / kullanıcı yönetimi uç noktaları | Elevation of Privilege | Sürücü rolündeki bir kullanıcı, doğrudan `POST /kullanicilar` çağırıp kendine yönetici rolü atar | Her yazma uç noktasında zorunlu rol kontrolü (dependency/middleware), sadece Yönetici bu uç noktayı çağırabilir — **Aşama 3 (RBAC)** |
+
+**Çıkarım:** Bu tabloda tekrar eden tek bir prensip var — **istemciden gelen hiçbir veriye
+(token içeriği dahil) güvenme, her yazma/okuma işleminde sunucu tarafında rol + sahiplik
+kontrolü yap.** Aşama 3'te RBAC'ı kurarken bu tablo bir kontrol listesi gibi kullanılacak.
+
+---
+
 *(Sonraki aşamalarda buraya JWT, WebSocket, ORM, RBAC gibi kavramlar eklenecek.)*
